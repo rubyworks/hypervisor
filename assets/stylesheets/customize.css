@@ -3,7 +3,7 @@ body{ background: #fff; color: #444; padding: 0 1em; }
  th { text-align: right; }
  td { padding: 0.5em; }
 
-.box { border: 1px solid #555; padding: 20px 40px; 
+.box { border-top: 1px solid #555; padding: 20px 40px; 
        margin: 1em 0; box-shadow: 0 0 5px #888; -moz-box-shadow: 0 0 5px #888;
      }
 
