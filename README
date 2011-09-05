@@ -1,0 +1,28 @@
+= Hypervisor
+
+
+== DESCRIPTION
+
+Hypervisor is a dynamic documentation format utilzing the Shomen standard
+documentation file and built with JQuery.
+
+
+== USAGE
+
+Simple as pie. Clone this repo to your project webite directory
+(or gh-pages branch if you are crazy like that).
+
+  $ cd myproject
+  $ git clone http://rubyworks.github.com/hypervisor.git site
+  $ cd site
+  $ rm -rf .git
+
+Then customized to your hearts desire.
+
+
+== LEGAL
+
+Copyright (c) 2010 Thomas Sawyer
+
+Available according to the terms of the *BSD-2-Clause* license.
+
