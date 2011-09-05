@@ -17,7 +17,13 @@ Simple as pie. Clone this repo to your project webite directory
   $ cd site
   $ rm -rf .git
 
-Then customized to your hearts desire.
+Generate the shomen doc.js file for you project to replace the example
+file.
+
+  $ cd ..
+  $ shomen > site/doc.js
+
+Then customize the template to your hearts desire.
 
 
 == LEGAL
