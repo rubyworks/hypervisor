@@ -21,7 +21,7 @@ Generate the shomen doc.js file for you project to replace the example
 file.
 
   $ cd ..
-  $ shomen > site/doc.js
+  $ shomen > site/doc.json
 
 Then customize the template to your hearts desire.
 
@@ -34,9 +34,9 @@ Available according to the terms of the *BSD-2-Clause* license.
 
 External libraries used:
 
-* jQuery       http://jquery.org
-* jqote2       htts://github.com/aefxx/jQote2
-* Quicksearch  http://github.com/riklomas/quicksearch
-* Highlight.js http://github.com/isagalaev/highlight.js
-* showdown.js  http://github.com/coreyti/showdown
+* {jQuery}[http://jquery.org]
+* {jqote2}[http://github.com/aefxx/jQote2]
+* {Quicksearch}[http://github.com/riklomas/quicksearch]
+* {Highlight.js}[http://github.com/isagalaev/highlight.js]
+* {showdown.js}[http://github.com/coreyti/showdown]
 
