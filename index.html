@@ -1,98 +1,144 @@
 <html>
 <head>
   <title>API</title>
-
-  <link rel="stylesheet" href="assets/javascripts/normalize.css" />
-  <link rel="stylesheet" href="assets/stylesheets/customize.css" />
+  <!-- -->
+  <link rel="stylesheet" href="assets/stylesheets/normalize.css" />
 
   <!-- Provides JQuery framework. -->
   <script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
-  <!-- Provides the slider/mousewheel widget. -->
-  <script src="http://cdn.jquerytools.org/1.2.5/full/jquery.tools.min.js"></script>
+
   <!-- Provides templating system. -->
   <script src="assets/javascripts/jquery.jqote2.min.js"></script>
+
   <!-- Provides search filtering. -->
   <script src="assets/javascripts/quicksearch.js"></script>
-  <!-- Provides markdown support. -->
-  <script src="assets/javascripts/showdown.js"></script>
+
+  <!-- Provides rdoc support. -->
+  <script src="assets/javascripts/rundown.js"></script>
+
   <!-- Provides markdown support. -->
   <script src="assets/javascripts/hypervisor.js"></script>
 
+  <!-- Provides syntax highlighting support. -->
+  <script src="http://yandex.st/highlightjs/6.0/highlight.min.js"></script>
+  <link rel="stylesheet" href="http://yandex.st/highlightjs/6.0/styles/default.min.css">
+
+  <!-- -->
   <script>
-  var converter = new Showdown.converter();
+  var converter = new Rundown.converter();
 
   $(document).ready(function(){
-    $.getJSON('doc.json', function(data) {
+    var urlVars = getUrlVars();
+    var url     = urlVars['doc'] || 'doc.json'
 
-      metadata = data['(metadata)'];
+    $.getJSON(url, function(data) {
+      //
+      table = new Array();
 
-      $('#header').append(
-        $('#template-header').jqote(metadata)
-      );
-
-      var table = new Array();
+      // set up documentation
       $.each(data, function(key, value) {
-        value.key = cleanId(key);
+        value.key   = key;
+        value.index = cleanId(key);
         table.push(value);
       });
 
       table.sort(compareNames);
 
+      documentation = data;  // global variable
+      metadata      = data['(metadata)'];
+
+      $('#header').append($('#template-header').jqote(metadata));
+      $('#header-resources').append($('#template-resources').jqote(metadata));
+
       $.each(table, function(index, value) {
-        type  = value['!'];
+        type = value['!'];
         switch(type) {
         case 'function':
           $('#methods').append($('#template-method-link').jqote(value));
-          $('#infobox').append($('#template-function-info').jqote(value));
+          //$('#infobox').append($('#template-function-info').jqote(value));
           break;
         case 'method':
           $('#methods').append($('#template-method-link').jqote(value));
-          $('#infobox').append($('#template-method-info').jqote(value));
+          //$('#infobox').append($('#template-method-info').jqote(value));
           break;
         case 'class':
-          $('#classes').append($('#template-module-link').jqote(value));
-          $('#infobox').append($('#template-module-info').jqote(value));
+          $('#classes').append($('#template-class-link').jqote(value));
+          //$('#infobox').append($('#template-module-info').jqote(value));
           break;
         case 'module':
           $('#classes').append($('#template-module-link').jqote(value));
-          $('#infobox').append($('#template-module-info').jqote(value));
+          //$('#infobox').append($('#template-module-info').jqote(value));
           break;
         case 'file':
           $('#file').append($('#template-file-link').jqote(value));
-          $('#infobox').append($('#template-file-info').jqote(value));
+          //$('#infobox').append($('#template-file-info').jqote(value));
           break;
         case 'script':
           $('#file').append($('#template-file-link').jqote(value));
-          $('#infobox').append($('#template-script-info').jqote(value));
+          //$('#infobox').append($('#template-script-info').jqote(value));
           break;
         };
-
       });
 
-      // TODO: how to generalize?
+      // TODO: how to generalize? also add '/' prefix in future.
+      //toggleBox('#api-file-README-dot-rdoc', 'README.rdoc');
+      $('#infobox').append($('#template-file-info').jqote(documentation['README.rdoc']));
       $('#api-file-README-dot-rdoc').show();
 
-      $(".scroll").scrollable({mousewheel: true}).navigator();
+      //$(".scroll").scrollable({mousewheel: true}).navigator();
 
       $('input#search-input').quicksearch('.items li', {
         'bind': 'keyup',
       });
     });
 
-    $('#abctabs').append($('#template-abctabs').jqote());
+    $(".scroll").mouseover(function(event) {
+      var ul  = $(this).find('ul');
+      var li  = ul.find('li:visible');
+      var sum = 0;
+      li.each( function(){ sum += $(this).outerWidth(); });
+      ul.width(sum);
+    });
 
+    $(".scroll").mousewheel(function(event, delta) {
+      this.scrollLeft -= (delta * event.pageX);
+      event.preventDefault();
+    });
+
+    $('#abctabs').append($('#template-abctabs').jqote());
   });
+
+  //
+  //hljs.tabReplace = '  ';
+  //hljs.initHighlightingOnLoad();
   </script>
+
+  <!-- Provides the slider/mousewheel widget.
+  <scrip src="http://cdn.jquerytools.org/1.2.5/full/jquery.tools.min.js"></script>
+  -->
+  <script src="assets/javascripts/jquery.mousewheel.min.js"></script>
+
+  <!--  -->
+  <link rel="stylesheet" href="assets/stylesheets/customize.css" />
 </head>
 
 <body>
   <div id="header">
-    <div class="raw-button"><button onclick="showRaw();">raw</button></div>
+    <div id="header-resources">
+    </div>
 
     <script type="text/x-jqote-template" id="template-header">
       <![CDATA[
         <h1><%= this.title %></h1>
         <h2><%= this.summary %></h2>
+      ]]>
+    </script>
+
+    <script type="text/x-jqote-template" id="template-resources">
+      <![CDATA[
+        <% for(label in this.resources) { %>
+          <a href="<%= this.resources[label] %>"><%= label %></a>
+        <% }; %>
       ]]>
     </script>
 
@@ -122,13 +168,13 @@
     </tr> <tr>
       <th style="width: 50px;">FILES</th>
       <td>
-        <div class="scroll">
-          <ul id="file" class="items">
+        <div id="f" class="slider scroll">
+          <ul id="file" class="slider items">
 
             <script type="text/x-jqote-template" id="template-file-link">
               <![CDATA[
                 <li>
-                  <button class="link" onclick="toggleBox('#api-file-<%= this.key %>');">
+                  <button class="link" onclick="toggleBox('#api-file-<%= this.index %>', '<%= this.key %>');">
                     <%= this.name %>
                   </button>
                 </li>
@@ -141,13 +187,25 @@
     </tr> <tr>
       <th style="width: 50px;">CLASSES</th>
       <td>
-        <div class="scroll">
-          <ul id="classes" class="items">
+        <div id="c" class="slider scroll">
+          <ul id="classes" class="slider items">
+
+            <script type="text/x-jqote-template" id="template-class-link">
+              <![CDATA[
+                <li>
+                  <button class="link" onclick="toggleBox('#api-class-<%= this.index %>', '<%= this.key %>');"
+                      title="<%= this.namespace + '::' + this.name %>"
+                        alt="<%= this.namespace + '::' + this.name %>">
+                    <%= this.name %>
+                  </button>
+                </li>
+              ]]>
+            </script>
 
             <script type="text/x-jqote-template" id="template-module-link">
               <![CDATA[
                 <li>
-                  <button class="link" onclick="toggleBox('#api-module-<%= this.key %>');"
+                  <button class="link" onclick="toggleBox('#api-module-<%= this.index %>', '<%= this.key %>');"
                       title="<%= this.namespace + '::' + this.name %>"
                         alt="<%= this.namespace + '::' + this.name %>">
                     <%= this.name %>
@@ -162,13 +220,13 @@
     </tr> <tr>
       <th style="width: 50px;">METHODS</th>
       <td>
-        <div class="scroll">
-          <ul id="methods" class="items">
+        <div id="m" class="slider scroll">
+          <ul id="methods" class="slider items">
 
             <script type="text/x-jqote-template" id="template-method-link">
               <![CDATA[
                 <li>
-                  <button class="link" onclick="toggleBox('#api-method-<%= this.key %>');">
+                  <button class="link" onclick="toggleBox('#api-method-<%= this.index %>', '<%= this.key %>');">
                     <%= this.name.escapeHTML() %>
                   </button>
                 </li>
@@ -186,9 +244,9 @@
 
     <script type="text/x-jqote-template" id="template-file-info">
       <![CDATA[
-        <div class="box" id="api-file-<%= this.key %>" style="display: none;">
+        <div class="box" id="api-file-<%= this.index %>" style="display: none;">
           <div style="float: right">
-            <button class="link" onclick="$('#api-file-<%= this.key %>').hide();">X</button>
+            <button class="link" onclick="$('#api-file-<%= this.index %>').hide();">X</button>
           </div>
           <div class="info-heading">
             <h2><%= this['!'] %></h2>
@@ -198,7 +256,7 @@
           <div class="info-content">
             <% if (this.text == undefined){ %>
             <% } else { %>
-              <pre><%= converter.makeHtml(this.text) %></pre>
+              <%= converter.makeHtml(this.text) %>
             <% } %>
           </div>
         </div>
@@ -207,40 +265,39 @@
 
     <script type="text/x-jqote-template" id="template-script-info">
       <![CDATA[
-        <div class="box" id="api-file-<%= this.key %>" style="display: none;">
+        <div class="box" id="api-file-<%= this.index %>" style="display: none;">
           <div style="float: right">
-            <button class="link" onclick="$('#api-file-<%= this.key %>').hide();">X</button>
+            <button class="link" onclick="$('#api-file-<%= this.index %>').hide();">X</button>
           </div>
           <div class="info-heading">
             <h2>script</h2>
             <h1><%= this.path %></h1>
             <h3><%= this.mtime %></h3>
-          </h2>
+          </div>
           <div class="info-content">
-            <pre><%= this.source.escapeHTML() %></pre>
+            <pre class="script"><code><%= this.source.escapeHTML() %></code></pre>
         </div>
       ]]>
     </script>
 
     <script type="text/x-jqote-template" id="template-module-info">
       <![CDATA[
-        <div class="box" id="api-module-<%= this.key %>" style="display: none;">
+        <div class="box" id="api-module-<%= this.index %>" style="display: none;">
           <div style="float: right">
-            <button class="link" onclick="$('#api-module-<%= this.key %>').hide();">X</button>
+            <button class="link" onclick="$('#api-module-<%= this.index %>').hide();">X</button>
           </div>
-
           <div class="info-heading">
             <h2><%= this['!'] %></h2>
             <h1>
             <span class="fade"><%= this.namespace %></span>::<%= this.name %>
             <% if (this['!'] == 'class'){ %>
-              <span class="fade">< <%= this.superclass || 'Object' %></span>
+              <span class="fade">&lt; <%= this.superclass || 'Object' %></span>
             <% }else{ %>
               <span class="fade"></span>
             <% } %>
             </h1>
             <h3></h3>
-          </h2>
+          </div>
           <div class="info-content">
             <p><%= converter.makeHtml(this.comment) %></p>
           </div>
@@ -248,11 +305,75 @@
       ]]>
     </script>
 
+    <script type="text/x-jqote-template" id="template-class-info">
+      <![CDATA[
+        <div class="box" id="api-class-<%= this.index %>" style="display: none;">
+          <div style="float: right">
+            <button class="link" onclick="$('#api-class-<%= this.index %>').hide();">X</button>
+          </div>
+          <div class="info-heading">
+            <h2><%= this['!'] %></h2>
+            <h1>
+              <span class="fade"><%= this.namespace %></span>::<%= this.name %>
+              <span class="fade">&lt; <%= this.superclass || 'Object' %></span>
+            </h1>
+            <h3></h3>
+          </div>
+          <div class="info-content">
+            <p><%= converter.makeHtml(this.comment) %></p>
+          </div>
+          <div class="class-breakdown">
+            <table>
+              <tr><th>Class Methods</th><th>Instance Methods</th><th>Constants</th></tr>
+              <tr>
+                <td>
+                  <ul>
+                  <% for(i in this.functions) { %>
+                    <% target = documentation[this.methods[i]]; %>
+                    <li>
+                      <button onclick="toggleBox('#api-function-<%= target.index %>', '<%= target.key %>')">
+                        <%= target['name'] %>
+                      </button>
+                    </li>
+                  <% } %>
+                  </ul>
+                </td>
+                <td>
+                  <ul>
+                  <% for(i in this.methods) { %>
+                    <% target = documentation[this.methods[i]]; %>
+                    <li>
+                      <button onclick="toggleBox('#api-method-<%= target.index %>', '<%= target.key %>')">
+                        <%= target['name'] %>
+                      </button>
+                    </li>
+                  <% } %>
+                  </ul>
+                </td>
+                <td>
+                  <ul>
+                  <% for(i in this.constants) { %>
+                    <% target = documentation[this.constants[i]]; %>
+                    <li>
+                      <button onclick="toggleBox('#api-constant-<%= target.index %>', '<%= target.key %>')">
+                        <%= target['name'] %>
+                      <button>
+                    </li>
+                  <% } %>
+                  </ul>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      ]]>
+    </script>
+
     <script type="text/x-jqote-template" id="template-method-info">
       <![CDATA[
-        <div class="box" id="api-method-<%= this.key %>" style="display: none;">
+        <div class="box" id="api-method-<%= this.index %>" style="display: none;">
           <div style="float: right">
-            <button class="link" onclick="$('#api-method-<%= this.key %>').hide();">X</button>
+            <button class="link" onclick="$('#api-method-<%= this.index %>').hide();">X</button>
           </div>
           <div class="info-heading">
             <h2><%= this['!'] %></h2>
@@ -268,9 +389,9 @@
 
     <script type="text/x-jqote-template" id="template-function-info">
       <![CDATA[
-        <div class="box" id="api-method-<%= this.key %>" style="display: none;">
+        <div class="box" id="api-method-<%= this.index %>" style="display: none;">
           <div style="float: right">
-            <button class="link" onclick="$('#api-method-<%= this.key %>').hide();">X</button>
+            <button class="link" onclick="$('#api-method-<%= this.index %>').hide();">X</button>
           </div>
           <div class="info-heading">
             <h2><%= this['!'] %></h2>
@@ -285,7 +406,11 @@
     </script>
 
     <div id="raw" class="box">
-      <h2>doc.js</h2>
+      <div class="right-floating-horizontal-menu">
+        <button onclick="showRaw();">view</button>
+        <button onclick="$('#raw').hide();"">X</button>
+      </div>
+      <h2>doc.json</h2>
     </div>
 
   </div>

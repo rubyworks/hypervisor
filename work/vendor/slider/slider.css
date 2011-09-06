@@ -1,0 +1,49 @@
+div.slider {
+  /* Set it so we could calculate the offsetLeft */
+  position: relative;
+  width: 100%;
+  /* Add scroll-bars */
+  overflow: hidden;
+}
+ul.slider {
+  display: block;
+  /* height: 110px; */
+  /* Max width here, for users without Javascript */
+  width: 20000px;
+  white-space:nowrap;
+  padding: 0 0 0 1em;
+  /* Remove default margin */
+  margin: 0;
+  background: url('navigation.png');
+  list-style: none;
+}
+.slider li {
+  display: block;
+  float: left;
+  padding: 0 4px;
+}
+.slider a {
+  display: block;
+  text-decoration: none;
+}
+.slider span {
+  /* We want a caption to display on the next line */
+  display: block;
+  margin-top: 3px;
+  text-align: center;
+  font-size: 12px;
+  color: #fff;
+}
+.slider a:hover span {
+  display: block;
+}
+.slider img {
+  border: 3px #fff solid;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+}
+.slider a:hover img {
+  filter:alpha(opacity=50);
+  opacity: 0.5;
+}
+

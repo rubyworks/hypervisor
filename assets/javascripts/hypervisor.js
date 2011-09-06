@@ -1,3 +1,5 @@
+var documentation;
+
 //
 String.prototype.escapeHTML = function () {
   return(                                                                 
@@ -8,10 +10,14 @@ String.prototype.escapeHTML = function () {
   );                                          
 };
 
-function toggleBox(boxId) {
-  boxId = boxId.replace(/[.,?!\s]/g, "_"); 
+function toggleBox(boxId, key) {
+  data = documentation[key];
+  type = data['!'];
+  $('#infobox').append($('#template-' + type + '-info').jqote(data));
+  //boxId = boxId.replace(/[.,?!\s]/g, "_"); 
   $('.box').hide();
   $(boxId).toggle();
+  $(boxId).find('pre code').each(function(i, e){hljs.highlightBlock(e, '  ')});
 };
 
 // TODO: better way please
@@ -59,7 +65,8 @@ function compareNames(a, b){
 //
 function showRaw(){
   $.getJSON('doc.json', function(data) {
-    toggleBox('#raw');
+    $('.box').hide();
+    $('#raw').show();
     $('#raw').append(recursive_parse(data));
   });
 };
@@ -82,4 +89,17 @@ function recursive_parse(data) {
 function clickABCTab(letter) {
   $("input#search-input").val(letter).trigger('keyup');
 };
+
+function getUrlVars()
+{
+  var vars = [], hash;
+  var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+  for(var i = 0; i < hashes.length; i++)
+  {
+    hash = hashes[i].split('=');
+    vars.push(hash[0]);
+    vars[hash[0]] = hash[1];
+  }
+  return vars;
+}
 
