@@ -1,32 +1,47 @@
 = Hypervisor
 
 
-== DESCRIPTION
+== Prepare...
 
-Hypervisor is a dynamic documentation format utilzing the Shomen standard
-documentation file and built with JQuery.
+to be amazed! The incredible Hypervisor is here. Your one-way ticket
+to documentation nirvana. Women have wept for less. Men have broken
+knuckles for less.
+
+Harnessing the powers of the Shomen standard documentation file format,
+and built on a jQuery powerhouse, Hypervisor is the champion of all
+poorly documented projects worldwide, upholding the principles of
+clarity, accessiblity and the Ruby Way!
 
 
-== USAGE
+== So how do we roll, dog?
 
-Simple as pie. Clone this repo to your project webite directory
-(or gh-pages branch if you are crazy like that).
+Simple as pie. Clone this repo to your project's webite directory
+(or `gh-pages` branch if you are crazy like that).
 
   $ cd myproject
   $ git clone http://rubyworks.github.com/hypervisor.git site
   $ cd site
   $ rm -rf .git
 
-Generate the shomen doc.js file for you project to replace the example
-file.
+Generate the shomen `doc.json` file for you project to replace
+the example file.
 
   $ cd ..
   $ shomen > site/doc.json
 
-Then customize the template to your hearts desire.
+Now fire up a webserver.
+
+  $ shomen --server
+
+You can also view the files directly if your browser supports local
+ajax calls (Firefox works. Chrome? Not so much).
+
+  $ firefox index.html
+
+Now then, customize that template to your little hearts desire!
 
 
-== LEGAL
+== Legalease
 
 Copyright (c) 2011 Thomas Sawyer
 
