@@ -1,19 +1,27 @@
 = Hypervisor
 
 
-== Prepare...
+== Welcome
 
-to be amazed! The incredible Hypervisor is here. Your one-way ticket
+And prepare to be amazed! The incredible Hypervisor is here. Your one-way ticket
 to documentation nirvana. Women have wept for less. Men have broken
 knuckles for less.
 
 Harnessing the powers of the Shomen standard documentation file format,
 and built on a jQuery powerhouse, Hypervisor is the champion of all
-poorly documented projects worldwide, upholding the principles of
-clarity, accessiblity and the Ruby Way!
+poorly documented projects around the world, upholding the principles
+of clarity, accessiblity and the Ruby Way!
 
 
-== So how do we roll, dog?
+== Features
+
+* Update a single portable file to update documentation.
+* Site disc footprint is extra small thanks to CDNs.
+* Personalize site design to best fit your project.
+* Test drive other's customizations with your own remote docs!
+
+
+== How To
 
 Simple as pie. Clone this repo to your project's webite directory
 (or `gh-pages` branch if you are crazy like that).
@@ -29,7 +37,8 @@ the example file.
   $ cd ..
   $ shomen > site/doc.json
 
-Now fire up a webserver.
+Now fire up local directory webserver. The `shomen` command provides
+one (must have sinatra installed):
 
   $ shomen --server
 
