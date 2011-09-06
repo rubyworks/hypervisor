@@ -35,9 +35,10 @@ button:hover { background: orange; color: white; }
 #header-resources {
   float: right;
   width: auto;
+  text-align: right;
 }
 
-#header-resources a, #header.resources button {
+#header-resources a, #header-resources button {
   font-size: 0.85em;
   padding: 0.5em;
   color: #66aaff; cursor: pointer;
