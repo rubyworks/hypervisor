@@ -74,6 +74,12 @@ HyperVisor = {
         };
       });
 
+      if(metadata.copyrights != null){
+        $.each(metadata.copyrights, function(i, cr) {
+          $('#copyrights').append($('#template-copyright').jqote(cr));
+        });
+      }
+
       // TODO: how to generalize? also add '/' prefix in future.
       //toggleBox('#api-README-dot-rdoc', 'README.rdoc');
       // $('#infobox').append($('#template-file-info').jqote(documentation['README.rdoc']));
@@ -101,6 +107,7 @@ HyperVisor = {
           HyperVisor.toggleBox(hash);   // restore the state from hash
         }
       });
+
     });
 
     $(".scroll").mouseover(function(event) {

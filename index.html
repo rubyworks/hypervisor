@@ -304,22 +304,10 @@
       <![CDATA[
         <table style="border:0; float: left; margin: 0 0 1em 0;">
           <tr>
-            <th>Instance</th>
             <th>Class</th>
+            <th>Instance</th>
           </tr>
           <tr>
-            <td>
-              <ul>
-              <% for(i in this.includes) { %>
-                <% target = documentation[this.includes[i]] || {}; %>
-                <li>
-                  <a href="#<%= target.id %>">
-                    <%= target.key %>
-                  <a>
-                </li>
-              <% } %>
-              </ul>
-            </td>
             <td>
               <ul> <!-- TODO: rename to extensions -->
               <% for(i in this.extensions) { %>
@@ -332,20 +320,20 @@
               <% } %>
               </ul>
             </td>
-          </tr>
-          <tr>
             <td>
               <ul>
-              <% for(i in this.attributes) { %>
-                <% target = documentation[this.attributes[i]] || {}; %>
+              <% for(i in this.includes) { %>
+                <% target = documentation[this.includes[i]] || {}; %>
                 <li>
                   <a href="#<%= target.id %>">
-                    <%= target.name %> (<%= target.rw.toLowerCase() %>)
+                    <%= target.key %>
                   <a>
                 </li>
               <% } %>
               </ul>
             </td>
+          </tr>
+          <tr>
             <td>
               <ul>
               <% for(i in this.class_attributes) { %>
@@ -358,19 +346,19 @@
               <% } %>
               </ul>
             </td>
-          </tr><tr>
             <td>
               <ul>
-              <% for(i in this.methods) { %>
-                <% target = documentation[this.methods[i]] || {}; %>
+              <% for(i in this.attributes) { %>
+                <% target = documentation[this.attributes[i]] || {}; %>
                 <li>
                   <a href="#<%= target.id %>">
-                    <%= target.name %>
-                  </a>
+                    <%= target.name %> (<%= target.rw.toLowerCase() %>)
+                  <a>
                 </li>
               <% } %>
               </ul>
             </td>
+          </tr><tr>
             <td>
               <ul>
               <% for(i in this.functions) { %>
@@ -383,9 +371,20 @@
               <% } %>
               </ul>
             </td>
+            <td>
+              <ul>
+              <% for(i in this.methods) { %>
+                <% target = documentation[this.methods[i]] || {}; %>
+                <li>
+                  <a href="#<%= target.id %>">
+                    <%= target.name %>
+                  </a>
+                </li>
+              <% } %>
+              </ul>
+            </td>
           </tr>
         </table>
-
         <table style="border: 0; float: left; padding: 0; margin: 0 0 0 1em;">
           <tr>
             <th>Constants</th>
@@ -486,8 +485,16 @@
       </div>
       <h2>doc.json</h2>
     </div>
-
   </div>
 
+  <div id="footer">
+    <spv id="copyrights"></span>
+
+    <script type="text/x-jqote-template" id="template-copyright">
+      Copyright <%= this.year %> <%= this.holder %>
+    </script>
+
+    Website generated with <a href="http://rubyworks.github.com/hypervisor">Hypervisor</a>.
+  </div>
 </body>
 </html>
