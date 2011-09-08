@@ -7,6 +7,9 @@
   <!-- Provides JQuery framework. -->
   <script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
 
+  <!-- Provides history system. -->
+  <script src="assets/javascripts/jquery.history.js"></script>
+
   <!-- Provides templating system. -->
   <script src="assets/javascripts/jquery.jqote2.min.js"></script>
 
@@ -23,94 +26,21 @@
   <script src="http://yandex.st/highlightjs/6.0/highlight.min.js"></script>
   <link rel="stylesheet" href="http://yandex.st/highlightjs/6.0/styles/default.min.css">
 
+  <!-- Provides keyboard shortcuts. -->
+  <script src="assets/javascripts/keymaster.js"></script>
+
   <!-- -->
   <script>
-  var converter = new Rundown.converter();
+    var documentation;
+    var documentation_by_id = {};
+    var converter = new Rundown.converter();  /* TODO: support other formats */
 
-  $(document).ready(function(){
-    var urlVars = getUrlVars();
-    var url     = urlVars['doc'] || 'doc.json'
-
-    $.getJSON(url, function(data) {
-      //
-      table = new Array();
-
-      // set up documentation
-      $.each(data, function(key, value) {
-        value.key   = key;
-        value.index = cleanId(key);
-        table.push(value);
-      });
-
-      table.sort(compareNames);
-
-      documentation = data;  // global variable
-      metadata      = data['(metadata)'];
-
-      $('#header').append($('#template-header').jqote(metadata));
-      $('#header-resources').append($('#template-resources').jqote(metadata));
-
-      $.each(table, function(index, value) {
-        type = value['!'];
-        switch(type) {
-        case 'function':
-          $('#methods').append($('#template-method-link').jqote(value));
-          //$('#infobox').append($('#template-function-info').jqote(value));
-          break;
-        case 'method':
-          $('#methods').append($('#template-method-link').jqote(value));
-          //$('#infobox').append($('#template-method-info').jqote(value));
-          break;
-        case 'class':
-          $('#classes').append($('#template-class-link').jqote(value));
-          //$('#infobox').append($('#template-module-info').jqote(value));
-          break;
-        case 'module':
-          $('#classes').append($('#template-module-link').jqote(value));
-          //$('#infobox').append($('#template-module-info').jqote(value));
-          break;
-        case 'file':
-          $('#file').append($('#template-file-link').jqote(value));
-          //$('#infobox').append($('#template-file-info').jqote(value));
-          break;
-        case 'script':
-          $('#file').append($('#template-file-link').jqote(value));
-          //$('#infobox').append($('#template-script-info').jqote(value));
-          break;
-        };
-      });
-
-      // TODO: how to generalize? also add '/' prefix in future.
-      //toggleBox('#api-file-README-dot-rdoc', 'README.rdoc');
-      $('#infobox').append($('#template-file-info').jqote(documentation['README.rdoc']));
-      $('#api-file-README-dot-rdoc').show();
-
-      //$(".scroll").scrollable({mousewheel: true}).navigator();
-
-      $('input#search-input').quicksearch('.items li', {
-        'bind': 'keyup',
-      });
+    $(document).ready(function(){
+      HyperVisor.bootup();               // initialize app
     });
 
-    $(".scroll").mouseover(function(event) {
-      var ul  = $(this).find('ul');
-      var li  = ul.find('li:visible');
-      var sum = 0;
-      li.each( function(){ sum += $(this).outerWidth(); });
-      ul.width(sum);
-    });
-
-    $(".scroll").mousewheel(function(event, delta) {
-      this.scrollLeft -= (delta * event.pageX);
-      event.preventDefault();
-    });
-
-    $('#abctabs').append($('#template-abctabs').jqote());
-  });
-
-  //
-  //hljs.tabReplace = '  ';
-  //hljs.initHighlightingOnLoad();
+    //hljs.tabReplace = '  ';
+    //hljs.initHighlightingOnLoad();
   </script>
 
   <!-- Provides the slider/mousewheel widget.
@@ -127,39 +57,52 @@
     <div id="header-resources">
     </div>
 
-    <script type="text/x-jqote-template" id="template-header">
+    <div id="header-title">
+    </div>
+
+    <script type="text/x-jqote-template" id="template-header-title">
       <![CDATA[
         <h1><%= this.title %></h1>
-        <h2><%= this.summary %></h2>
+        <h2><%= this.summary || '' %></h2>
       ]]>
     </script>
 
-    <script type="text/x-jqote-template" id="template-resources">
+    <script type="text/x-jqote-template" id="template-header-resources">
       <![CDATA[
+        <div>
         <% for(label in this.resources) { %>
           <a href="<%= this.resources[label] %>"><%= label %></a>
         <% }; %>
-        <br /><br /><button onclick="$('#raw').toggle();">(meta)</button>
+        </div>
+        <div style="margin-top: 1em;">
+          <button onclick="$('#raw').toggle();">Meta</button> &nbsp;
+          <button onclick="HyperVisor.decreaseFontSize();" style="font-size: 0.9em; padding: 0 0 0 0.5em;">A</button>
+          <button onclick="HyperVisor.resetFontSize();" style="font-size: 1em; padding: 0;">--</button>
+          <button onclick="HyperVisor.increaseFontSize();" style="font-size: 1.2em; padding: 0 0.5em 0 0;">A</button>
+        </div>
       ]]>
     </script>
 
+    <br style="clear: both;" />
   </div>
+
   <div id="ribbon">
     <table width="100%">
     <tr>
       <th>Search</th>
       <td>
         <div id="search-field">
-          <input id="search-input" type="text" value="" /> &nbsp;
+          <input id="search-input"  type="text" value="" />
+          <input id="search-letter" type="hidden" value="" style="width: 1.5em;" /> &nbsp;
           <span id="abctabs">
 
             <script type="text/x-jqote-template" id="template-abctabs">
               <![CDATA[
                 <% abc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; %>
                 <% for (i=0;i<=25;i++) { %>
-                  <button class="letter" onclick="clickABCTab('<%= abc[i] %>');"><%= abc[i] %></button>
+                  <button class="letter" onclick="HyperVisor.clickABCTab('<%= abc[i] %>');"><%= abc[i] %></button>
                 <% } %>
-                <button class="letter" onclick="clickABCTab('');">(clear)</button>
+                <button id="clear-button" class="letter" onclick="HyperVisor.clickABCTab('');">(clear)</button>
               ]]>
             </script>
 
@@ -175,9 +118,11 @@
             <script type="text/x-jqote-template" id="template-file-link">
               <![CDATA[
                 <li>
-                  <button class="link" onclick="toggleBox('#api-file-<%= this.index %>', '<%= this.key %>');">
+                  <a class="link" href="#<%= this.id %>"
+                      title="<%= this.path %>"
+                        alt="<%= this.path %>">
                     <%= this.name %>
-                  </button>
+                  </a>
                 </li>
               ]]>
             </script>
@@ -194,11 +139,11 @@
             <script type="text/x-jqote-template" id="template-class-link">
               <![CDATA[
                 <li>
-                  <button class="link" onclick="toggleBox('#api-class-<%= this.index %>', '<%= this.key %>');"
-                      title="<%= this.namespace + '::' + this.name %>"
-                        alt="<%= this.namespace + '::' + this.name %>">
+                  <a class="link" href="#<%= this.id %>"
+                      title="<%= this.key %>"
+                        alt="<%= this.key %>">
                     <%= this.name %>
-                  </button>
+                  </a>
                 </li>
               ]]>
             </script>
@@ -206,11 +151,11 @@
             <script type="text/x-jqote-template" id="template-module-link">
               <![CDATA[
                 <li>
-                  <button class="link" onclick="toggleBox('#api-module-<%= this.index %>', '<%= this.key %>');"
-                      title="<%= this.namespace + '::' + this.name %>"
-                        alt="<%= this.namespace + '::' + this.name %>">
+                  <a class="link" href="#<%= this.id %>"
+                      title="<%= this.key %>"
+                        alt="<%= this.key %>">
                     <%= this.name %>
-                  </button>
+                  </a>
                 </li>
               ]]>
             </script>
@@ -227,9 +172,11 @@
             <script type="text/x-jqote-template" id="template-method-link">
               <![CDATA[
                 <li>
-                  <button class="link" onclick="toggleBox('#api-method-<%= this.index %>', '<%= this.key %>');">
+                  <a class="link" href="#<%= this.id %>"
+                      title="<%= this.key %>"
+                        alt="<%= this.key %>">
                     <%= this.name.escapeHTML() %>
-                  </button>
+                  </a>
                 </li>
               ]]>
             </script>
@@ -245,9 +192,9 @@
 
     <script type="text/x-jqote-template" id="template-file-info">
       <![CDATA[
-        <div class="box" id="api-file-<%= this.index %>" style="display: none;">
+        <div class="box" id="<%= this.id %>" style="display: none;">
           <div style="float: right">
-            <button class="link" onclick="$('#api-file-<%= this.index %>').hide();">X</button>
+            <button class="link" onclick="$('#<%= this.id %>').hide();">X</button>
           </div>
           <div class="info-heading">
             <h2><%= this['!'] %></h2>
@@ -266,51 +213,76 @@
 
     <script type="text/x-jqote-template" id="template-script-info">
       <![CDATA[
-        <div class="box" id="api-file-<%= this.index %>" style="display: none;">
+        <div class="box" id="<%= this.id %>" style="display: none;">
           <div style="float: right">
-            <button class="link" onclick="$('#api-file-<%= this.index %>').hide();">X</button>
+            <button class="link" onclick="$('#<%= this.id %>').hide();">X</button>
           </div>
           <div class="info-heading">
-            <h2>script</h2>
+            <h2><%= this['!'] %></h2>
             <h1><%= this.path %></h1>
             <h3><%= this.mtime %></h3>
           </div>
           <div class="info-content">
             <pre class="script"><code><%= this.source.escapeHTML() %></code></pre>
+          </div>
+        </div>
+      ]]>
+    </script>
+
+    <script type="text/x-jqote-template" id="template-constant-info">
+      <![CDATA[
+        <div class="box" id="<%= this.id %>" style="display: none;">
+          <div style="float: right">
+            <button class="link" onclick="$('#<%= this.id %>').hide();">X</button>
+          </div>
+          <div class="info-heading">
+            <h2><%= this['!'] %></h2>
+            <h1>
+              <span class="fade"><%= this.namespace %></span>::<%= this.name %>
+              <span class="fade"></span>
+            </h1>
+            <h3></h3>
+          </div>
+          <div class="info-content">
+            <p><%= converter.makeHtml(this.value) %></p>
+          </div>
+          <br style="clear: both;" />
         </div>
       ]]>
     </script>
 
     <script type="text/x-jqote-template" id="template-module-info">
       <![CDATA[
-        <div class="box" id="api-module-<%= this.index %>" style="display: none;">
+        <div class="box" id="<%= this.id %>" style="display: none;">
           <div style="float: right">
-            <button class="link" onclick="$('#api-module-<%= this.index %>').hide();">X</button>
+            <button class="link" onclick="$('.class-breakdown').toggle();">Detail</button>
+            <button class="link" onclick="$('#<%= this.id %>').hide();">X</button>
           </div>
           <div class="info-heading">
             <h2><%= this['!'] %></h2>
             <h1>
-            <span class="fade"><%= this.namespace %></span>::<%= this.name %>
-            <% if (this['!'] == 'class'){ %>
-              <span class="fade">&lt; <%= this.superclass || 'Object' %></span>
-            <% }else{ %>
+              <span class="fade"><%= this.namespace %></span>::<%= this.name %>
               <span class="fade"></span>
-            <% } %>
             </h1>
             <h3></h3>
+          </div>
+          <div class="class-breakdown" style="float:left;">
+            <%= $('#template-detail').jqote(this) %>
           </div>
           <div class="info-content">
             <p><%= converter.makeHtml(this.comment) %></p>
           </div>
+          <br style="clear: both;" />
         </div>
       ]]>
     </script>
 
     <script type="text/x-jqote-template" id="template-class-info">
       <![CDATA[
-        <div class="box" id="api-class-<%= this.index %>" style="display: none;">
+        <div class="box" id="<%= this.id %>" style="display: none;">
           <div style="float: right">
-            <button class="link" onclick="$('#api-class-<%= this.index %>').hide();">X</button>
+            <button class="link" onclick="$('.class-breakdown').toggle();">Detail</button>
+            <button class="link" onclick="$('<%= this.id %>').hide();">X</button>
           </div>
           <div class="info-heading">
             <h2><%= this['!'] %></h2>
@@ -320,96 +292,200 @@
             </h1>
             <h3></h3>
           </div>
+          <div class="class-breakdown" style="float:left;">
+            <%= $('#template-detail').jqote(this) %>
+          </div>
           <div class="info-content">
             <p><%= converter.makeHtml(this.comment) %></p>
           </div>
-          <div class="class-breakdown">
-            <table>
-              <tr><th>Class Methods</th><th>Instance Methods</th><th>Constants</th></tr>
-              <tr>
-                <td>
-                  <ul>
-                  <% for(i in this.functions) { %>
-                    <% target = documentation[this.methods[i]]; %>
-                    <li>
-                      <button onclick="toggleBox('#api-function-<%= target.index %>', '<%= target.key %>')">
-                        <%= target['name'] %>
-                      </button>
-                    </li>
-                  <% } %>
-                  </ul>
-                </td>
-                <td>
-                  <ul>
-                  <% for(i in this.methods) { %>
-                    <% target = documentation[this.methods[i]]; %>
-                    <li>
-                      <button onclick="toggleBox('#api-method-<%= target.index %>', '<%= target.key %>')">
-                        <%= target['name'] %>
-                      </button>
-                    </li>
-                  <% } %>
-                  </ul>
-                </td>
-                <td>
-                  <ul>
-                  <% for(i in this.constants) { %>
-                    <% target = documentation[this.constants[i]]; %>
-                    <li>
-                      <button onclick="toggleBox('#api-constant-<%= target.index %>', '<%= target.key %>')">
-                        <%= target['name'] %>
-                      <button>
-                    </li>
-                  <% } %>
-                  </ul>
-                </td>
-              </tr>
-            </table>
-          </div>
+          <br style="clear: both;" />
         </div>
+      ]]>
+    </script>
+
+    <script type="text/x-jqote-template" id="template-detail">
+      <![CDATA[
+        <table style="border:0; float: left; margin: 0 0 1em 0;">
+          <tr>
+            <th>Instance</th>
+            <th>Class</th>
+          </tr>
+          <tr>
+            <td>
+              <ul>
+              <% for(i in this.includes) { %>
+                <% target = documentation[this.includes[i]] || {}; %>
+                <li>
+                  <a href="#<%= target.id %>">
+                    <%= target.key %>
+                  <a>
+                </li>
+              <% } %>
+              </ul>
+            </td>
+            <td>
+              <ul> <!-- TODO: rename to extensions -->
+              <% for(i in this.extensions) { %>
+                <% target = documentation[this.extensions[i]] || {}; %>
+                <li>
+                  <a href="#<%= target.id %>">
+                    <%= target.key %>
+                  <a>
+                </li>
+              <% } %>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <ul>
+              <% for(i in this.attributes) { %>
+                <% target = documentation[this.attributes[i]] || {}; %>
+                <li>
+                  <a href="#<%= target.id %>">
+                    <%= target.name %> (<%= target.rw.toLowerCase() %>)
+                  <a>
+                </li>
+              <% } %>
+              </ul>
+            </td>
+            <td>
+              <ul>
+              <% for(i in this.class_attributes) { %>
+                <% target = documentation[this.class_attributes[i]] || {}; %>
+                <li>
+                  <a href="#<%= target.id %>">
+                    <%= target.name %> (<%= target.rw.toLowerCase() %>)
+                  <a>
+                </li>
+              <% } %>
+              </ul>
+            </td>
+          </tr><tr>
+            <td>
+              <ul>
+              <% for(i in this.methods) { %>
+                <% target = documentation[this.methods[i]] || {}; %>
+                <li>
+                  <a href="#<%= target.id %>">
+                    <%= target.name %>
+                  </a>
+                </li>
+              <% } %>
+              </ul>
+            </td>
+            <td>
+              <ul>
+              <% for(i in this.functions) { %>
+                <% target = documentation[this.functions[i]] || {}; %>
+                <li>
+                  <a href="#<%= target.id %>">
+                    <%= target.name %>
+                  </a>
+                </li>
+              <% } %>
+              </ul>
+            </td>
+          </tr>
+        </table>
+
+        <table style="border: 0; float: left; padding: 0; margin: 0 0 0 1em;">
+          <tr>
+            <th>Constants</th>
+          </tr>
+          <tr>
+            <td>
+              <ul>
+              <% for(i in this.constants) { %>
+                <% target = documentation[this.constants[i]] || {}; %>
+                <li>
+                  <a href="#<%= target.id %>">
+                    <%= target['name'] %>
+                  <a>
+                </li>
+              <% } %>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <th colspan="3">In Scripts</th>
+          </tr>
+          <tr>
+            <td colspan="3">
+              <ul> <!-- TODO: add root '/' -->
+              <% for(i in this.files) { %>
+                <% target = documentation[this.files[i]] || {}; %>
+                <li>
+                  <a href="#<%= target.id %>">
+                    <%= target.path %>
+                  <a>
+                </li>
+              <% } %>
+              </ul>
+            </td>
+          </tr>
+        </table>
       ]]>
     </script>
 
     <script type="text/x-jqote-template" id="template-method-info">
       <![CDATA[
-        <div class="box" id="api-method-<%= this.index %>" style="display: none;">
+        <div class="box" id="<%= this.id %>" style="display: none;">
           <div style="float: right">
-            <button class="link" onclick="$('#api-method-<%= this.index %>').hide();">X</button>
+            <button class="link" onclick="$('#<%= this.id %>').hide();">X</button>
           </div>
           <div class="info-heading">
             <h2><%= this['!'] %></h2>
-              <h1><span class="fade"><%= this.parent %></span>#<%= this.name %><h1>
+              <h1><span class="fade"><%= this.namespace %></span>#<%= this.name %><h1>
             <h3></h3>
           </div>
           <div class="info-content">
             <p><%= converter.makeHtml(this.comment) %></p>
-          <div>
+          </div>
+        </div>
+      ]]>
+    </script>
+
+    <script type="text/x-jqote-template" id="template-attribute-info">
+      <![CDATA[
+        <div class="box" id="<%= this.id %>" style="display: none;">
+          <div style="float: right">
+            <button class="link" onclick="$('#<%= this.id %>').hide();">X</button>
+          </div>
+          <div class="info-heading">
+            <h2><%= this['!'] %> (<%= this.rw %>)</h2>
+              <h1><span class="fade"><%= this.namespace %></span>#<%= this.name %><h1>
+            <h3></h3>
+          </div>
+          <div class="info-content">
+            <p><%= converter.makeHtml(this.comment) %></p>
+          </div>
         </div>
       ]]>
     </script>
 
     <script type="text/x-jqote-template" id="template-function-info">
       <![CDATA[
-        <div class="box" id="api-method-<%= this.index %>" style="display: none;">
+        <div class="box" id="<%= this.id %>" style="display: none;">
           <div style="float: right">
-            <button class="link" onclick="$('#api-method-<%= this.index %>').hide();">X</button>
+            <button class="link" onclick="$('#<%= this.id %>').hide();">X</button>
           </div>
           <div class="info-heading">
             <h2><%= this['!'] %></h2>
-              <h1><span class="fade"><%= this.parent %></span>.<%= this.name %><h1>
+              <h1><span class="fade"><%= this.namespace %></span>.<%= this.name %><h1>
             <h3></h3>
           </div>
           <div class="info-content">
             <p><%= converter.makeHtml(this.comment) %></p>
-          <div>
+          </div>
         </div>
       ]]>
     </script>
 
     <div id="raw" class="box">
       <div class="right-floating-horizontal-menu">
-        <button onclick="showRaw();">view</button>
-        <button onclick="$('#raw').hide();"">X</button>
+        <button onclick="HyperVisor.viewMeta();">Detail</button>
+        <button onclick="$('#raw').hide();"">X</button> <!-- Rawhide! (whipcrack!) -->
       </div>
       <h2>doc.json</h2>
     </div>
