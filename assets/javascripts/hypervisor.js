@@ -229,29 +229,6 @@ HyperVisor = {
     return vars;
   },
 
-  resetFontSize: function() {
-    var ourText = $('html,table');
-    ourText.css({fontSize: '1em'});
-  },
-
-  increaseFontSize: function() {
-    var ourText = $('html,table');
-    var currFontSize = ourText.css('fontSize');
-    var finalNum = parseFloat(currFontSize, 10);
-    var stringEnding = currFontSize.slice(-2);
-    finalNum *= 1.2;
-    ourText.css({fontSize: finalNum + stringEnding});
-  },
-
-  decreaseFontSize: function() {
-    var ourText = $('html,table');
-    var currFontSize = ourText.css('fontSize');
-    var finalNum = parseFloat(currFontSize, 10);
-    var stringEnding = currFontSize.slice(-2);
-    finalNum /= 1.2;
-    ourText.css({fontSize: finalNum + stringEnding});
-  }
-
 };
 
 
