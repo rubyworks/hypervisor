@@ -7,13 +7,15 @@
 # from the Detroit project.
 
 trip 'publish' do
+  require 'detroit'
   require 'detroit-github'
-  github = Detroit::GitHub.new do |gh|
-    gh.sitemap = {
+
+  github = Detroit::GitHub.new(
+    :sitemap => {
       'index.html' => 'index.html',
       'assets'     => 'assets'
     }
-  end
+  )
   github.publish
 end
 
