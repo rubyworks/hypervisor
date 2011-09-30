@@ -13,6 +13,7 @@ trip 'publish' do
   github = Detroit::GitHub.new(
     :sitemap => {
       'index.html' => 'index.html',
+      'doc.json'   => 'doc.json',
       'assets'     => 'assets'
     }
   )
