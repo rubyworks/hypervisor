@@ -8,7 +8,7 @@ String.prototype.escapeHTML = function () {
          replace(/\>/g,'&gt;').
          replace(/\</g,'&lt;').
          replace(/\"/g,'&quot;')
-  );                                          
+  );                                 
 };
 
 //
@@ -20,13 +20,15 @@ HyperVisor = {
     var url     = urlVars['doc'] || 'doc.json'
 
     $.getJSON(url, function(data) {
-      // set up documentation
-
-      // alphabetical table
+      // set up documentation & alphabetical table
       table = new Array();
       $.each(data, function(key, doc) {
         doc.key = key;  // ensure key is the same
-        doc.id  = 'api-' + doc['!'] + '-' + HyperVisor.cleanId(key);
+        if (doc.path != undefined) {
+          doc.id = HyperVisor.cleanId('api-' + doc['!'] + '-' + doc.path);
+        } else {
+          doc.id = 'metadata'
+        }
         table.push(doc);
         // by key
         documentation[doc.key] = doc;
@@ -44,32 +46,21 @@ HyperVisor = {
       $.each(table, function(index, value) {
         type = value['!'];
         switch(type) {
-        case 'function':
-          $('#methods').append($('#template-method-link').jqote(value));
-          //$('#infobox').append($('#template-function-info').jqote(value));
-          break;
         case 'method':
-          $('#methods').append($('#template-method-link').jqote(value));
-          //$('#infobox').append($('#template-method-info').jqote(value));
-          break;
-        case 'attribute':
           $('#methods').append($('#template-method-link').jqote(value));
           break;
         case 'class':
           $('#classes').append($('#template-class-link').jqote(value));
-          //$('#infobox').append($('#template-module-info').jqote(value));
           break;
         case 'module':
           $('#classes').append($('#template-module-link').jqote(value));
-          //$('#infobox').append($('#template-module-info').jqote(value));
           break;
+        case 'document':
         case 'file':
           $('#file').append($('#template-file-link').jqote(value));
-          //$('#infobox').append($('#template-file-info').jqote(value));
           break;
         case 'script':
           $('#file').append($('#template-file-link').jqote(value));
-          //$('#infobox').append($('#template-script-info').jqote(value));
           break;
         };
       });
@@ -101,8 +92,8 @@ HyperVisor = {
 
       // CENTRAL CONTROL
       $.history.init(function(hash){
-        if(hash == "") {          
-          HyperVisor.toggleBox('api-file-README-rdoc');
+        if(hash == "") {          // TODO: use main setting
+          HyperVisor.toggleBox('api-document-README.rdoc');
         } else {
           HyperVisor.toggleBox(hash);   // restore the state from hash
         }
@@ -155,13 +146,16 @@ HyperVisor = {
     anId = anId.replace(/\:/g,  "-c-");
     anId = anId.replace(/[/]/g, "-s-");
     anId = anId.replace(/\W+/g, "-");  // TOO GENERAL?
+    anId = anId.replace(/\W+/g, "-");  // For GOOD MEASURE
     return(anId);
   },
 
   toggleBox: function(boxId) {
     var id = this.cleanId(boxId);
+    //console.log(id);
     //if ($(boxId).length == 0) {
       data = documentation_by_id[id];
+      //console.log(data);
       $('#infobox').append($('#template-' + data['!'] + '-info').jqote(data));
       $('.box').hide();
       $('#'+id).toggle();
@@ -173,7 +167,7 @@ HyperVisor = {
   },
 
   toggleBoxByKey: function(key) {
-      boxId = this.cleanId(key);
+    boxId = this.cleanId(key);
     //if ($(boxId).length == 0) {
       data = documentation[key];
       $('#infobox').append($('#template-' + data['!'] + '-info').jqote(data));

@@ -75,7 +75,7 @@
         <% }; %>
         </div>
         <div style="margin-top: 1em;">
-          <button onclick="$('#raw').toggle();">Meta</button>&nbsp;
+          <button onclick="$('#raw').toggle();">metadata</button>&nbsp;
         </div>
       ]]>
     </script>
@@ -137,8 +137,8 @@
               <![CDATA[
                 <li>
                   <a class="link" href="#<%= this.id %>"
-                      title="<%= this.key %>"
-                        alt="<%= this.key %>">
+                      title="<%= this.path %>"
+                        alt="<%= this.path %>">
                     <%= this.name %>
                   </a>
                 </li>
@@ -149,8 +149,8 @@
               <![CDATA[
                 <li>
                   <a class="link" href="#<%= this.id %>"
-                      title="<%= this.key %>"
-                        alt="<%= this.key %>">
+                      title="<%= this.path %>"
+                        alt="<%= this.path %>">
                     <%= this.name %>
                   </a>
                 </li>
@@ -187,7 +187,7 @@
 
   <div id="infobox">
 
-    <script type="text/x-jqote-template" id="template-file-info">
+    <script type="text/x-jqote-template" id="template-document-info">
       <![CDATA[
         <div class="box" id="<%= this.id %>" style="display: none;">
           <div style="float: right">
@@ -323,11 +323,17 @@
             <td>
               <ul>
               <% for(i in this.includes) { %>
-                <% target = documentation[this.includes[i]] || {}; %>
+                <% target = documentation[this.includes[i]]; %>
                 <li>
-                  <a href="#<%= target.id %>">
-                    <%= target.key %>
-                  <a>
+                  <% if (target != null) { %>
+                    <a href="#<%= target.id %>">
+                      <%= target.name %>
+                    <a>
+                  <% } else { %>
+                    <a style="color: #888;">  <!-- TODO: use a css class -->
+                      <%= this.includes[i] %>
+                    </a> 
+                  <% } %>
                 </li>
               <% } %>
               </ul>
@@ -336,38 +342,44 @@
           <tr>
             <td>
               <ul>
-              <% for(i in this.class_attributes) { %>
-                <% target = documentation[this.class_attributes[i]] || {}; %>
-                <li>
-                  <a href="#<%= target.id %>">
-                    <%= target.name %> (<%= target.rw.toLowerCase() %>)
-                  <a>
-                </li>
+              <% for(i in this.accessors) { %>
+                <% target = documentation[this.accessors[i]] || {}; %>
+                <% if (target.singleton == true) { %>
+                  <li>
+                    <a href="#<%= target.id %>">
+                      <%= target.name %>
+                    <a>
+                  </li>
+                <% } %>
               <% } %>
               </ul>
             </td>
             <td>
               <ul>
-              <% for(i in this.attributes) { %>
-                <% target = documentation[this.attributes[i]] || {}; %>
-                <li>
-                  <a href="#<%= target.id %>">
-                    <%= target.name %> (<%= target.rw.toLowerCase() %>)
-                  <a>
-                </li>
+              <% for(i in this.accessors) { %>
+                <% target = documentation[this.accessors[i]] || {}; %>
+                <% if (target.singleton == false) { %>
+                  <li>
+                    <a href="#<%= target.id %>">
+                      <%= target.name %>
+                    <a>
+                  </li>
+                <% } %>
               <% } %>
               </ul>
             </td>
           </tr><tr>
             <td>
               <ul>
-              <% for(i in this.functions) { %>
-                <% target = documentation[this.functions[i]] || {}; %>
-                <li>
-                  <a href="#<%= target.id %>">
-                    <%= target.name %>
-                  </a>
-                </li>
+              <% for(i in this.methods) { %>
+                <% target = documentation[this.methods[i]] || {}; %>
+                <% if (target.singleton == true) { %>
+                  <li>
+                    <a href="#<%= target.id %>">
+                      <%= target.name %>
+                    </a>
+                  </li>
+                <% } %>
               <% } %>
               </ul>
             </td>
@@ -375,11 +387,13 @@
               <ul>
               <% for(i in this.methods) { %>
                 <% target = documentation[this.methods[i]] || {}; %>
-                <li>
-                  <a href="#<%= target.id %>">
-                    <%= target.name %>
-                  </a>
-                </li>
+                <% if (target.singleton == false) { %>
+                  <li>
+                    <a href="#<%= target.id %>">
+                      <%= target.name %>
+                    </a>
+                  </li>
+                <% } %>
               <% } %>
               </ul>
             </td>
@@ -408,7 +422,7 @@
           </tr>
           <tr>
             <td colspan="3">
-              <ul> <!-- TODO: add root '/' -->
+              <ul>  <!-- TODO: remove line, e.g. `:7` from files[i] -->
               <% for(i in this.files) { %>
                 <% target = documentation[this.files[i]] || {}; %>
                 <li>
@@ -460,7 +474,8 @@
       ]]>
     </script>
 
-    <script type="text/x-jqote-template" id="template-function-info">
+<!--
+    <script type="text/x-jqote-template" id="template-class-method-info">
       <![CDATA[
         <div class="box" id="<%= this.id %>" style="display: none;">
           <div style="float: right">
@@ -477,6 +492,7 @@
         </div>
       ]]>
     </script>
+-->
 
     <div id="raw" class="box">
       <div class="right-floating-horizontal-menu">
