@@ -220,7 +220,15 @@
             <h3><%= this.mtime %></h3>
           </div>
           <div class="info-content">
-            <pre class="script"><code><%= this.source.escapeHTML() %></code></pre>
+            <% if (this.uri != null) { %>
+              <div class="scm-uri">
+                <a target="_blank" href="<%= this.uri %>">Click here to view source code via repository</a>.
+              </div>
+            <% } %>
+
+            <% if (this.source != null) { %>
+              <pre class="script"><code><%= this.source.escapeHTML() %></code></pre>
+            <% } %>
           </div>
         </div>
       ]]>
