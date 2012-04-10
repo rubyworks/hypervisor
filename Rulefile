@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+
+ignore 'web'
+
+# Reapfile, primarily for publishing the project
+# to it's GitHub gh-pages website.
+#
+# The publish task uses the detroit-github plugin
+# from the Detroit project.
+
+desc "publish to github"
+task 'publish' do
+  github.publish
+end
+
+desc "prepare for github"
+task "prepare" do
+  github.prepare
+end
+
+def github
+  @github ||= (
+    require 'detroit'
+    require 'detroit-github'
+   
+    Detroit::GitHub.new(
+      :folder  => 'web',
+      :sitemap => {
+        'index.html' => 'index.html',
+        'doc.json'   => 'doc.json',
+        'assets'     => 'assets'
+      }
+    )
+  ) 
+end
+
