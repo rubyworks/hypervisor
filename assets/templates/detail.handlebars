@@ -1,0 +1,108 @@
+<table style="border:0; float: left; margin: 0 0 1em 0;">
+  <tr>
+    <th>Class</th>
+    <th>Instance</th>
+  </tr>
+  <tr>
+    <td>
+      <ul> <!-- TODO: rename to extensions -->
+      {{#doc extensions}}
+        <li>
+          <a href="#{{id}}">{{key}}<a>
+        </li>
+      {{/doc}}
+      </ul>
+    </td>
+    <td>
+      <ul>
+      {{#doc includes}}
+        <li>
+          {{#if id}}
+            <a href="#{{id}}">{{name}}</a>
+          {{else}}
+            <!-- TODO: use a css class -->
+            <a style="color: #888;">{{name}}</a> 
+          {{/if}}
+        </li>
+      {{/doc}}
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <ul>
+      {{#doc accessors}}
+        {{#if singleton}}
+          <li>
+            <a href="#{{id}}">{{name}}</a>
+          </li>
+        {{/if}}
+      {{/doc}}
+      </ul>
+    </td>
+    <td>
+      <ul>
+      {{#doc accessors}}
+        {{#unless singleton}}
+          <li>
+            <a href="#{{id}}">{{name}}</a>
+          </li>
+        {{/unless}}
+      {{/doc}}
+      </ul>
+    </td>
+  </tr><tr>
+    <td>
+      <ul>
+      {{#doc methods}}
+        {{#if singleton}}
+          <li>
+            <a href="#{{id}}">{{name}}</a>
+          </li>
+        {{/if}}
+      {{/doc}}
+      </ul>
+    </td>
+    <td>
+      <ul>
+      {{#doc methods}}
+        {{#unless singleton}}
+          <li>
+            <a href="#{{id}}">{{name}}</a>
+          </li>
+        {{/unless}}
+      {{/doc}}
+      </ul>
+    </td>
+  </tr>
+</table>
+<table style="border: 0; float: left; padding: 0; margin: 0 0 0 1em;">
+  <tr>
+    <th>Constants</th>
+  </tr>
+  <tr>
+    <td>
+      <ul>
+      {{#doc constants}}
+        <li>
+          <a href="#{{id}}">{{name}}</a>
+        </li>
+      {{/doc}}
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <th colspan="3">In Scripts</th>
+  </tr>
+  <tr>
+    <td colspan="3">
+      <ul>  <!-- TODO: remove line, e.g. `:7` from files[i] -->
+      {{#doc files}}
+        <li>
+          <a href="#{{id}}">{{path}}</a>
+        </li>
+      {{/doc}}
+      </ul>
+    </td>
+  </tr>
+</table>

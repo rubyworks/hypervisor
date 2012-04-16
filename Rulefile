@@ -2,22 +2,42 @@
 
 ignore 'web'
 
-# Reapfile, primarily for publishing the project
-# to it's GitHub gh-pages website.
+#
+# Run thin server to give site a spin.
+#
+desc "start thin server"
+task "server" do
+  sh "thin start -A file"
+end
+
+#
+# Compile Handlebar.js templates.
+#
+desc "compile templates"
+task 'compile' do
+  sh "handlebars assets/templates/*.handlebars -f assets/javascripts/handlebars.templates.js"
+end
+
 #
 # The publish task uses the detroit-github plugin
 # from the Detroit project.
-
+#
 desc "publish to github"
 task 'publish' do
   github.publish
 end
 
+#
+#
+#
 desc "prepare for github"
 task "prepare" do
   github.prepare
 end
 
+#
+#
+#
 def github
   @github ||= (
     require 'detroit'

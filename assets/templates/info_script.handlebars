@@ -1,0 +1,22 @@
+<div class="box" id="{{id}}" style="display: none;">
+  <div style="float: right">
+    <button class="link" onclick="$('#{{id}}').hide();">X</button>
+  </div>
+  <div class="info-heading">
+    <h2>{{[!]}}</h2>
+    <h1>{{path}}</h1>
+    <h3>{{modified}}</h3>
+  </div>
+  <div class="info-content">
+    {{#if uri}}
+      <div class="scm-uri">
+        <a target="_blank" href="{{uri}}">Click here to view source code via repository</a>.
+      </div>
+    {{/if}}
+
+    {{#if source}}
+      <pre class="script"><code>{{source}}</code></pre>
+    {{/if}}
+  </div>
+</div>
+
