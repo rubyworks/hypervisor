@@ -1,7 +1,7 @@
 var documentation = {};
 var documentation_by_id = {};
 
-//
+// @deprecated
 String.prototype.escapeHTML = function () {
   return(                                                                 
     this.replace(/\&/g,'&amp;').                                
@@ -40,34 +40,34 @@ HyperVisor = {
       documentation = data;  // global variable
       metadata      = data['(metadata)'];
 
-      $('#header-title').append($('#template-header-title').jqote(metadata));
-      $('#header-resources').append($('#template-header-resources').jqote(metadata));
+      $('#header-title').append(Handlebars.templates.meta_title(metadata));
+      $('#header-resources').append(Handlebars.templates.meta_resources(metadata));
 
       $.each(table, function(index, value) {
         type = value['!'];
         switch(type) {
         case 'method':
-          $('#methods').append($('#template-method-link').jqote(value));
+          $('#methods').append(Handlebars.templates.link_method(value));
           break;
         case 'class':
-          $('#classes').append($('#template-class-link').jqote(value));
+          $('#classes').append(Handlebars.templates.link_class(value));
           break;
         case 'module':
-          $('#classes').append($('#template-module-link').jqote(value));
+          $('#classes').append(Handlebars.templates.link_module(value));
           break;
         case 'document':
         case 'file':
-          $('#file').append($('#template-file-link').jqote(value));
+          $('#file').append(Handlebars.templates.link_file(value));
           break;
         case 'script':
-          $('#file').append($('#template-file-link').jqote(value));
+          $('#file').append(Handlebars.templates.link_file(value));
           break;
         };
       });
 
       if(metadata.copyrights != null){
         $.each(metadata.copyrights, function(i, cr) {
-          $('#copyrights').append($('#template-copyright').jqote(cr));
+          $('#copyrights').append(Handlebars.templates.meta_copyright(cr));
         });
       }
 
@@ -115,7 +115,7 @@ HyperVisor = {
     });
 
     // Build ABC filter bar.
-    $('#abctabs').append($('#template-abctabs').jqote());
+    $('#abctabs').append(Handlebars.templates.abctabs());
     var letters = '';
     for(i=65;i<91;i++){
       letters = letters + ',' + String.fromCharCode(i);
@@ -152,11 +152,10 @@ HyperVisor = {
 
   toggleBox: function(boxId) {
     var id = this.cleanId(boxId);
-    //console.log(id);
     //if ($(boxId).length == 0) {
       data = documentation_by_id[id];
       //console.log(data);
-      $('#infobox').append($('#template-' + data['!'] + '-info').jqote(data));
+      $('#infobox').append(Handlebars.templates['info_' + data['!']](data));
       $('.box').hide();
       $('#'+id).toggle();
       $('#'+id).find('pre code').each(function(i, e){hljs.highlightBlock(e, '  ')});
@@ -170,7 +169,7 @@ HyperVisor = {
     boxId = this.cleanId(key);
     //if ($(boxId).length == 0) {
       data = documentation[key];
-      $('#infobox').append($('#template-' + data['!'] + '-info').jqote(data));
+      $('#infobox').append(Handlebars.templates['info_' + data['!']](data));
       //boxId = boxId.replace(/[.,?!\s]/g, "_"); 
       $('.box').hide();
       $(boxId).toggle();
