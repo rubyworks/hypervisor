@@ -14,34 +14,36 @@ end
 # Compile Handlebar.js templates.
 #
 desc "compile templates"
-task 'compile' do
+task "compile" do
   sh "handlebars source/templates/*.handlebars -f assets/javascripts/handlebars.templates.js"
 end
 
-#
+# compile templates
+file 'source/templates/**/*' do
+  run :compile
+end
+
+# Copy files to web directory.
+task 'web:copy' do
+  mkdir_p 'web'
+  install 'index.html', 'web/index.html'
+  install 'doc.json', 'web/doc.json'
+  sync 'assets', 'web/assets'
+end
+
 # The publish task uses the detroit-github plugin
 # from the Detroit project.
-#
 desc "publish to github"
-task 'publish' do
-  mkdir_p 'website'
-  install 'index.html', 'website/index.html'
-  install 'doc.json', 'website/doc.json'
-  sync 'assets', 'website/assets'
-
+task 'web:publish' => ['web:copy'] do
   github.publish
 end
 
-#
-#
-#
+# Create web directory for gh-pages repo.
 desc "prepare for github"
 task "prepare" do
   github.prepare
 end
 
-#
-#
 #
 def github
   @github ||= (
